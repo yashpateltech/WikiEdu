@@ -254,6 +254,42 @@ Notification destination: ${NOTIFICATION_EMAIL}
   console.log(`College: ${enquiry.collegeName} | Course: ${enquiry.courseInterestedIn}`);
   console.log('====================================================');
 
+  // 1. Direct keyless relay to yashpatelseo19@gmail.com via FormSubmit
+  try {
+    const fsResponse = await fetch(`https://formsubmit.co/ajax/${NOTIFICATION_EMAIL}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': process.env.APP_URL || 'https://wikiedu.vercel.app',
+        'Referer': process.env.APP_URL || 'https://wikiedu.vercel.app/'
+      },
+      body: JSON.stringify({
+        _subject: subject,
+        _replyto: enquiry.email,
+        _template: 'table',
+        _captcha: 'false',
+        'Applicant Name': enquiry.fullName,
+        'Email Address': enquiry.email,
+        'Mobile Phone': enquiry.mobileNumber,
+        'College / Institute': enquiry.collegeName,
+        'Course / Program': enquiry.courseInterestedIn,
+        'Location': `${enquiry.city}, ${enquiry.country}`,
+        'Preferred Intake': enquiry.preferredIntake,
+        'Highest Qualification': enquiry.highestQualification,
+        'Work Experience': enquiry.workExperience,
+        'Applicant Message': enquiry.message,
+        'Reference ID': enquiry.id,
+        'Submission Timestamp': enquiry.createdAt
+      })
+    });
+    const fsResult = await fsResponse.json();
+    console.log(`[KEYLESS DISPATCH] FormSubmit relay result for ${NOTIFICATION_EMAIL}:`, fsResult.message || fsResult.success);
+  } catch (fsErr) {
+    console.warn('[KEYLESS DISPATCH] FormSubmit relay notice:', fsErr);
+  }
+
+  // 2. Custom SMTP transporter (if configured)
   if (mailTransporter) {
     try {
       const info = await mailTransporter.sendMail({
@@ -264,7 +300,7 @@ Notification destination: ${NOTIFICATION_EMAIL}
         text: textContent,
         html: htmlContent
       });
-      console.log(`[MAIL] Message sent successfully to ${NOTIFICATION_EMAIL}. Response ID:`, info.messageId || 'local-dispatch');
+      console.log(`[MAIL] Message dispatched to ${NOTIFICATION_EMAIL}. Response ID:`, info.messageId || 'local-dispatch');
     } catch (mailError) {
       console.error(`[MAIL] Failed to dispatch via transporter to ${NOTIFICATION_EMAIL}:`, mailError);
     }
