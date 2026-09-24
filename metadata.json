@@ -1,0 +1,7 @@
+{
+  "name": "Global MBA & Management Education Directory",
+  "description": "Discover, compare and enquire about top MBA, Executive MBA, MiM, and management programs from premier business schools worldwide.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
