@@ -3,9 +3,10 @@ import { GraduationCap, Mail, MapPin, ExternalLink, Globe2, CheckCircle } from '
 
 interface FooterProps {
   onNavigate: (path: string) => void;
+  onOpenEnquiry?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenEnquiry }) => {
   return (
     <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 pt-14 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,7 +35,26 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 <Globe2 className="w-4 h-4 text-blue-400 flex-shrink-0" />
                 <span>Coverage across 16+ countries and 50+ specializations</span>
               </div>
+              <div className="flex items-center gap-2 text-slate-300 pt-1">
+                <Mail className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <span>Admissions Inquiries: </span>
+                <a href="mailto:yashpatelseo19@gmail.com" className="text-blue-400 hover:underline font-mono">
+                  yashpatelseo19@gmail.com
+                </a>
+              </div>
             </div>
+
+            {onOpenEnquiry && (
+              <div className="pt-2">
+                <button
+                  onClick={onOpenEnquiry}
+                  className="px-4 py-2 bg-blue-600/90 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>Submit Program Lead / Enquiry</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Popular Destinations */}

@@ -1,0 +1,53 @@
+[
+  {
+    "id": "ENQ-MUFZJYYX-8249",
+    "fullName": "Admissions Test",
+    "mobileNumber": "+91 99999 88888",
+    "email": "test@example.com",
+    "country": "India",
+    "city": "Ahmedabad",
+    "courseInterestedIn": "PGDM",
+    "collegeName": "Narayana Business School",
+    "preferredIntake": "2026 Batch",
+    "highestQualification": "B.Com",
+    "workExperience": "Fresh Graduate",
+    "message": "Testing email dispatch to yashpatelseo19@gmail.com",
+    "consent": true,
+    "createdAt": "2026-09-24T20:29:51.177Z",
+    "status": "New"
+  },
+  {
+    "id": "ENQ-INIT-001",
+    "fullName": "Rahul Sharma",
+    "mobileNumber": "+91 98765 43210",
+    "email": "rahul.s@example.com",
+    "country": "India",
+    "city": "Mumbai",
+    "courseInterestedIn": "PGDM (Dual Specialization)",
+    "collegeName": "Narayana Business School",
+    "preferredIntake": "Autumn 2026",
+    "highestQualification": "B.Tech in Computer Science",
+    "workExperience": "2 Years in IT Consultancy",
+    "message": "Interested in knowing scholarship eligibility and entrance cutoff criteria for PGDM.",
+    "consent": true,
+    "createdAt": "2026-09-23T20:29:47.114Z",
+    "status": "Contacted"
+  },
+  {
+    "id": "ENQ-INIT-002",
+    "fullName": "Claire Dubois",
+    "mobileNumber": "+33 6 12 34 56 78",
+    "email": "c.dubois@example.fr",
+    "country": "France",
+    "city": "Paris",
+    "courseInterestedIn": "Global Accelerated MBA",
+    "collegeName": "Fontainebleau Institute of International Management",
+    "preferredIntake": "January 2027",
+    "highestQualification": "Master of Economics",
+    "workExperience": "4 Years in Financial Services",
+    "message": "Requesting syllabus details regarding sustainable finance electives.",
+    "consent": true,
+    "createdAt": "2026-09-22T20:29:47.115Z",
+    "status": "In Review"
+  }
+]

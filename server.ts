@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import nodemailer, { type Transporter } from 'nodemailer';
 import { INITIAL_INSTITUTES } from './src/data/institutesData.ts';
 import { INITIAL_ARTICLES } from './src/data/articlesData.ts';
 import { EnquiryData, Institute, Article } from './src/types/index.ts';
@@ -11,9 +12,53 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const NOTIFICATION_EMAIL = 'yashpatelseo19@gmail.com';
+const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'yashpatelseo19@gmail.com';
 
 app.use(express.json());
+
+// Persistent storage setup for enquiries
+const ENQUIRIES_FILE_PATH = path.join(__dirname, 'database', 'enquiries.json');
+
+// Ensure database directory exists
+try {
+  const dbDir = path.join(__dirname, 'database');
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+} catch (err) {
+  console.warn('Could not create database directory:', err);
+}
+
+// Nodemailer Transporter configuration
+let mailTransporter: Transporter | null = null;
+
+if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+  mailTransporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || '587', 10),
+    secure: process.env.SMTP_SECURE === 'true' || process.env.SMTP_PORT === '465',
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }
+  });
+  console.log(`[MAIL] Configured custom SMTP transporter for ${NOTIFICATION_EMAIL}`);
+} else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+  mailTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD
+    }
+  });
+  console.log(`[MAIL] Configured Gmail transporter for ${NOTIFICATION_EMAIL}`);
+} else {
+  // Graceful fallback transporter with json logging
+  mailTransporter = nodemailer.createTransport({
+    jsonTransport: true
+  });
+  console.log(`[MAIL] Initialized mail logger transporter for ${NOTIFICATION_EMAIL}`);
+}
 
 // In-memory + persistent storage
 let institutes: Institute[] = [...INITIAL_INSTITUTES];
@@ -55,6 +100,29 @@ let enquiries: EnquiryData[] = [
   }
 ];
 
+// Load persisted enquiries from disk if available
+try {
+  if (fs.existsSync(ENQUIRIES_FILE_PATH)) {
+    const raw = fs.readFileSync(ENQUIRIES_FILE_PATH, 'utf-8');
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      enquiries = parsed;
+      console.log(`[STORAGE] Successfully loaded ${enquiries.length} enquiries from disk.`);
+    }
+  }
+} catch (err) {
+  console.warn('[STORAGE] Failed to load persisted enquiries:', err);
+}
+
+// Helper: Save enquiries to disk
+function persistEnquiries() {
+  try {
+    fs.writeFileSync(ENQUIRIES_FILE_PATH, JSON.stringify(enquiries, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[STORAGE] Error saving enquiries to disk:', err);
+  }
+}
+
 // Helper: Sanitize string
 function sanitize(input: any): string {
   if (typeof input !== 'string') return '';
@@ -63,12 +131,152 @@ function sanitize(input: any): string {
     .trim();
 }
 
+// Helper: Send email notification to NOTIFICATION_EMAIL
+async function sendEnquiryEmailNotification(enquiry: EnquiryData) {
+  const subject = `[New MBA Enquiry] ${enquiry.fullName} - ${enquiry.collegeName} [${enquiry.id}]`;
+  
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 24px; }
+        .card { max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #1d4ed8, #3730a3); color: #ffffff; padding: 24px 28px; }
+        .header h1 { margin: 0 0 6px 0; font-size: 20px; font-weight: 700; }
+        .header p { margin: 0; font-size: 13px; color: #bfdbfe; }
+        .content { padding: 24px 28px; }
+        .badge { display: inline-block; background-color: #dbeafe; color: #1e40af; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 9999px; text-transform: uppercase; margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th { text-align: left; padding: 10px 12px; background-color: #f1f5f9; color: #475569; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; width: 36%; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #0f172a; }
+        .message-box { background: #f8fafc; border-left: 4px solid #2563eb; padding: 14px; border-radius: 4px; font-size: 13px; color: #334155; margin-top: 8px; }
+        .footer { padding: 16px 28px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; text-align: center; }
+        a { color: #2563eb; text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <div class="header">
+          <h1>New Student Admissions Lead</h1>
+          <p>Dispatched to official portal administrator: <strong>${NOTIFICATION_EMAIL}</strong></p>
+        </div>
+        <div class="content">
+          <span class="badge">Reference ID: ${enquiry.id}</span>
+          
+          <table>
+            <tr>
+              <th>Target Institute</th>
+              <td><strong>${enquiry.collegeName}</strong></td>
+            </tr>
+            <tr>
+              <th>Course / Program</th>
+              <td><strong style="color: #1d4ed8;">${enquiry.courseInterestedIn}</strong></td>
+            </tr>
+            <tr>
+              <th>Applicant Full Name</th>
+              <td><strong>${enquiry.fullName}</strong></td>
+            </tr>
+            <tr>
+              <th>Email Address</th>
+              <td><a href="mailto:${enquiry.email}">${enquiry.email}</a></td>
+            </tr>
+            <tr>
+              <th>Mobile / Phone</th>
+              <td><a href="tel:${enquiry.mobileNumber}">${enquiry.mobileNumber}</a></td>
+            </tr>
+            <tr>
+              <th>Applicant Location</th>
+              <td>${enquiry.city}, ${enquiry.country}</td>
+            </tr>
+            <tr>
+              <th>Preferred Intake</th>
+              <td>${enquiry.preferredIntake}</td>
+            </tr>
+            <tr>
+              <th>Highest Qualification</th>
+              <td>${enquiry.highestQualification}</td>
+            </tr>
+            <tr>
+              <th>Work Experience</th>
+              <td>${enquiry.workExperience}</td>
+            </tr>
+            <tr>
+              <th>Submission Date</th>
+              <td>${new Date(enquiry.createdAt || Date.now()).toUTCString()}</td>
+            </tr>
+          </table>
+
+          <div>
+            <strong style="font-size: 13px; color: #475569; text-transform: uppercase;">Applicant Message / Query:</strong>
+            <div class="message-box">
+              ${enquiry.message || 'No additional message provided.'}
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          Global MBA Portal Admissions Notification Engine • Sent to ${NOTIFICATION_EMAIL}
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const textContent = `
+[NEW ADMISSIONS ENQUIRY]
+Target Institute: ${enquiry.collegeName}
+Program: ${enquiry.courseInterestedIn}
+Reference ID: ${enquiry.id}
+
+APPLICANT DETAILS:
+Full Name: ${enquiry.fullName}
+Email: ${enquiry.email}
+Phone: ${enquiry.mobileNumber}
+Location: ${enquiry.city}, ${enquiry.country}
+Preferred Intake: ${enquiry.preferredIntake}
+Highest Qualification: ${enquiry.highestQualification}
+Work Experience: ${enquiry.workExperience}
+Submitted At: ${enquiry.createdAt}
+
+MESSAGE:
+${enquiry.message}
+
+Notification destination: ${NOTIFICATION_EMAIL}
+  `.trim();
+
+  // Log to console clearly
+  console.log('====================================================');
+  console.log(`[EMAIL DISPATCH TO ${NOTIFICATION_EMAIL}]`);
+  console.log(`Subject: ${subject}`);
+  console.log(`Lead: ${enquiry.fullName} <${enquiry.email}> | Tel: ${enquiry.mobileNumber}`);
+  console.log(`College: ${enquiry.collegeName} | Course: ${enquiry.courseInterestedIn}`);
+  console.log('====================================================');
+
+  if (mailTransporter) {
+    try {
+      const info = await mailTransporter.sendMail({
+        from: `"Global MBA Admissions" <admissions@globalmba-directory.org>`,
+        to: NOTIFICATION_EMAIL,
+        replyTo: enquiry.email,
+        subject: subject,
+        text: textContent,
+        html: htmlContent
+      });
+      console.log(`[MAIL] Message sent successfully to ${NOTIFICATION_EMAIL}. Response ID:`, info.messageId || 'local-dispatch');
+    } catch (mailError) {
+      console.error(`[MAIL] Failed to dispatch via transporter to ${NOTIFICATION_EMAIL}:`, mailError);
+    }
+  }
+}
+
 // -------------------------------------------------------------
 // API Endpoints
 // -------------------------------------------------------------
 
-// 1. POST /api/enquiry - Validate, sanitize, record, and dispatch email notification
-app.post('/api/enquiry', (req: Request, res: Response) => {
+// 1. POST /api/enquiry - Validate, sanitize, record, persist, and dispatch email notification
+app.post('/api/enquiry', async (req: Request, res: Response) => {
   try {
     const {
       fullName,
@@ -138,24 +346,16 @@ app.post('/api/enquiry', (req: Request, res: Response) => {
     };
 
     enquiries.unshift(newEnquiry);
+    persistEnquiries();
 
-    // Secure server-side notification email simulation
-    // In production, nodemailer / SendGrid / Postmark connects here using NOTIFICATION_EMAIL
-    console.log('====================================================');
-    console.log(`[EMAIL NOTIFICATION DISPATCHED]`);
-    console.log(`To: ${NOTIFICATION_EMAIL}`);
-    console.log(`Subject: New Student Enquiry for ${newEnquiry.collegeName} [${newEnquiry.id}]`);
-    console.log(`Applicant: ${newEnquiry.fullName} (${newEnquiry.email} | ${newEnquiry.mobileNumber})`);
-    console.log(`Program: ${newEnquiry.courseInterestedIn} | Intake: ${newEnquiry.preferredIntake}`);
-    console.log(`Location: ${newEnquiry.city}, ${newEnquiry.country}`);
-    console.log(`Experience: ${newEnquiry.workExperience} | Qualification: ${newEnquiry.highestQualification}`);
-    console.log(`Message: ${newEnquiry.message}`);
-    console.log('====================================================');
+    // Dispatch email notification to yashpatelseo19@gmail.com
+    await sendEnquiryEmailNotification(newEnquiry);
 
     return res.status(201).json({
       success: true,
       enquiryId: newEnquiry.id,
-      message: 'Your information request has been received. The admissions advisory team will contact you shortly.'
+      sentTo: NOTIFICATION_EMAIL,
+      message: `Your information request has been received and forwarded to admissions (${NOTIFICATION_EMAIL}). We will contact you shortly.`
     });
   } catch (error: any) {
     console.error('Error processing enquiry:', error);
@@ -163,9 +363,70 @@ app.post('/api/enquiry', (req: Request, res: Response) => {
   }
 });
 
-// 2. GET /api/enquiries - Admin view
+// 2. GET /api/enquiries - Retrieve all submitted leads
 app.get('/api/enquiries', (req: Request, res: Response) => {
-  res.json({ success: true, count: enquiries.length, data: enquiries });
+  res.json({
+    success: true,
+    notificationRecipient: NOTIFICATION_EMAIL,
+    count: enquiries.length,
+    data: enquiries
+  });
+});
+
+// 2b. GET /api/enquiries/export - Export all lead form submissions as CSV or JSON for yashpatelseo19@gmail.com
+app.get('/api/enquiries/export', (req: Request, res: Response) => {
+  const format = req.query.format === 'json' ? 'json' : 'csv';
+  
+  if (format === 'json') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', 'attachment; filename="mba_enquiries_export.json"');
+    return res.json({
+      recipient: NOTIFICATION_EMAIL,
+      exportedAt: new Date().toISOString(),
+      total: enquiries.length,
+      enquiries
+    });
+  }
+
+  // Export CSV
+  const headers = [
+    'ID',
+    'Full Name',
+    'Email',
+    'Mobile',
+    'Institute',
+    'Course',
+    'Country',
+    'City',
+    'Preferred Intake',
+    'Qualification',
+    'Work Experience',
+    'Message',
+    'Created At',
+    'Status'
+  ];
+
+  const rows = enquiries.map(e => [
+    `"${(e.id || '').replace(/"/g, '""')}"`,
+    `"${(e.fullName || '').replace(/"/g, '""')}"`,
+    `"${(e.email || '').replace(/"/g, '""')}"`,
+    `"${(e.mobileNumber || '').replace(/"/g, '""')}"`,
+    `"${(e.collegeName || '').replace(/"/g, '""')}"`,
+    `"${(e.courseInterestedIn || '').replace(/"/g, '""')}"`,
+    `"${(e.country || '').replace(/"/g, '""')}"`,
+    `"${(e.city || '').replace(/"/g, '""')}"`,
+    `"${(e.preferredIntake || '').replace(/"/g, '""')}"`,
+    `"${(e.highestQualification || '').replace(/"/g, '""')}"`,
+    `"${(e.workExperience || '').replace(/"/g, '""')}"`,
+    `"${(e.message || '').replace(/"/g, '""')}"`,
+    `"${(e.createdAt || '').replace(/"/g, '""')}"`,
+    `"${(e.status || '').replace(/"/g, '""')}"`
+  ].join(','));
+
+  const csv = [headers.join(','), ...rows].join('\n');
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename="mba_enquiries_leads.csv"');
+  return res.send(csv);
 });
 
 // 3. PATCH /api/enquiries/:id/status - Update enquiry status

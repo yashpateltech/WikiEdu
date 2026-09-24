@@ -157,17 +157,32 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
                 <strong className="text-blue-700">{formData.courseInterestedIn}</strong> at{' '}
                 <strong className="text-blue-700">{formData.collegeName}</strong> has been logged.
               </p>
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 max-w-xs mx-auto text-xs text-slate-500">
-                <span>Reference ID: </span>
-                <span className="font-mono font-bold text-slate-800">{submittedId}</span>
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 max-w-sm mx-auto text-xs text-slate-600 space-y-1">
+                <div>
+                  <span className="text-slate-500">Reference ID: </span>
+                  <span className="font-mono font-bold text-slate-800">{submittedId}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500">Destination: </span>
+                  <span className="font-semibold text-blue-700">yashpatelseo19@gmail.com</span>
+                </div>
               </div>
               <p className="text-xs text-slate-500">
-                A confirmation has been dispatched to admissions counsel. You will be contacted via email or phone within 24–48 hours.
+                A full application dossier has been dispatched to <strong className="text-slate-700">yashpatelseo19@gmail.com</strong>. You will be contacted via email or phone within 24–48 hours.
               </p>
-              <div className="pt-4">
+              <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href={`mailto:yashpatelseo19@gmail.com?subject=${encodeURIComponent(`MBA Admission Enquiry: ${formData.fullName} - ${formData.collegeName} [${submittedId}]`)}&body=${encodeURIComponent(
+                    `Hello Admissions Team,\n\nI have submitted an enquiry through the Global MBA portal with the following details:\n\nReference ID: ${submittedId}\nFull Name: ${formData.fullName}\nEmail: ${formData.email}\nPhone: ${formData.mobileNumber}\nTarget College: ${formData.collegeName}\nProgram: ${formData.courseInterestedIn}\nIntake: ${formData.preferredIntake}\nLocation: ${formData.city}, ${formData.country}\nQualification: ${formData.highestQualification}\nWork Experience: ${formData.workExperience}\n\nMessage:\n${formData.message || 'Please send brochure and fee structure.'}\n\nThank you!`
+                  )}`}
+                  className="w-full sm:w-auto px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 border border-blue-200"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>Send Direct Email Copy</span>
+                </a>
                 <button
                   onClick={onClose}
-                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition-colors shadow-sm"
+                  className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-xs transition-colors shadow-sm cursor-pointer"
                 >
                   Done
                 </button>

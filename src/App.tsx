@@ -233,7 +233,7 @@ export default function App() {
       </div>
 
       {/* Footer */}
-      <Footer onNavigate={navigate} />
+      <Footer onNavigate={navigate} onOpenEnquiry={openEnquiry} />
 
       {/* Global Enquiry Popup Modal */}
       <EnquiryModal
