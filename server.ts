@@ -12,8 +12,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 const NOTIFICATION_EMAIL = 'yashpatelseo19@gmail.com';
-const ADMIN_EMAIL = 'yashpatelseo19@gmail.com';
-const ADMIN_PASSWORD = 'Yp1311999@';
 
 app.use(express.json());
 
@@ -64,55 +62,6 @@ function sanitize(input: any): string {
     .replace(/<[^>]*>/g, '') // Strip HTML tags
     .trim();
 }
-
-// -------------------------------------------------------------
-// Admin Authentication Endpoints
-// -------------------------------------------------------------
-
-// POST /api/admin/login - Authenticate admin with email and password
-app.post('/api/admin/login', (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
-    }
-
-    if (email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASSWORD) {
-      const token = `adm_token_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-      return res.json({
-        success: true,
-        message: 'Authentication successful',
-        token,
-        user: {
-          email: ADMIN_EMAIL,
-          role: 'Super Administrator',
-          name: 'Yash Patel',
-          permissions: ['all']
-        }
-      });
-    }
-
-    return res.status(401).json({ error: 'Invalid Administrator Email or Password. Access denied.' });
-  } catch (err: any) {
-    return res.status(500).json({ error: 'Authentication service error.' });
-  }
-});
-
-// GET /api/admin/session - Verify session
-app.get('/api/admin/session', (req: Request, res: Response) => {
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith('Bearer adm_token_')) {
-    return res.json({
-      authenticated: true,
-      user: {
-        email: ADMIN_EMAIL,
-        role: 'Super Administrator',
-        name: 'Yash Patel'
-      }
-    });
-  }
-  return res.status(401).json({ authenticated: false, error: 'Unauthorized' });
-});
 
 // -------------------------------------------------------------
 // API Endpoints
@@ -397,7 +346,6 @@ app.get('/robots.txt', (req: Request, res: Response) => {
   const robotsTxt = `# Robots.txt for Global MBA & Management Education Directory
 User-agent: *
 Allow: /
-Disallow: /admin
 Disallow: /api/
 
 Sitemap: ${appUrl}/sitemap.xml

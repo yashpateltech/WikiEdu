@@ -53,21 +53,7 @@ A complete, modern, responsive educational website and independent information p
    - Destination URL: [https://nbs.edu.in/top-mba-colleges-in-india/](https://nbs.edu.in/top-mba-colleges-in-india/) (opens in new tab with `target="_blank" rel="noopener noreferrer"`).
    - Displayed on desktop institute profile and article pages.
 
-6. **Admin & Management Portal (`/admin/`)**
-   - **Administrator Login Authentication**:
-     - **Admin ID / Email**: `yashpatelseo19@gmail.com`
-     - **Password**: `Yp1311999@`
-     - Secure session tokens stored and validated with `/api/admin/login` and `/api/admin/session`.
-   - **Global Dataset of 1,000 Verified Institutes**:
-     - Complete repository of 1,000 business schools worldwide across 17 countries/regions (India, USA, UK, France, Germany, Spain, Canada, Australia, Singapore, UAE, Switzerland, Netherlands, Italy, Ireland, Japan, South Korea, etc.).
-     - Paginated registry table with keyword search, country filter, program type filter, and featured status toggles.
-   - Manage business schools (Create, Update, Delete, Toggle Featured).
-   - Fields: Name, Country, City, Description, Official Website, Logo, Cover Image, Programs, Fees, Duration, Eligibility, Specializations, Application URL, Featured status.
-   - Manage student lead enquiries (view contact info, course interested, background, and update statuses: *New*, *In Review*, *Contacted*, *Closed*).
-   - Educational articles management.
-   - Sponsored advertisement metrics review.
-
-7. **SEO & Clean URL Structure**
+6. **SEO & Clean URL Structure**
    - Clean URLs:
      - `/mba-colleges/`
      - `/mba-colleges/india/`
@@ -80,7 +66,6 @@ A complete, modern, responsive educational website and independent information p
      - `/specializations/business-analytics/`
      - `/blog/`
      - `/blog/top-mba-specializations-future-careers/`
-     - `/admin/`
    - Dynamic `<title>` and `<meta name="description">` tags.
    - Canonical links (`<link rel="canonical">`).
    - Open Graph (`og:title`, `og:description`, `og:url`, `og:type`) & Twitter Cards.

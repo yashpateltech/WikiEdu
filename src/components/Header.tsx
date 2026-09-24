@@ -9,7 +9,6 @@ import {
   BookOpen,
   Layers,
   FileText,
-  ShieldCheck,
   ChevronDown
 } from 'lucide-react';
 
@@ -231,16 +230,6 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, currentPath, onOpenE
             >
               Articles
             </button>
-
-            <button
-              onClick={() => handleNav('/admin/')}
-              className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1.5 ${
-                isActive('/admin') ? 'text-indigo-600 bg-indigo-50/80 font-bold' : 'text-slate-600 hover:text-indigo-600 hover:bg-slate-50'
-              }`}
-            >
-              <ShieldCheck className="w-4 h-4 text-indigo-500" />
-              <span>Admin Portal</span>
-            </button>
           </nav>
 
           {/* Right Action Button */}
@@ -346,14 +335,6 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, currentPath, onOpenE
               className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-slate-800 hover:bg-slate-100"
             >
               Admission Articles & Guides
-            </button>
-
-            <button
-              onClick={() => handleNav('/admin/')}
-              className="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold text-indigo-700 bg-indigo-50 flex items-center gap-2"
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>Admin Management Portal</span>
             </button>
           </div>
 

@@ -9,7 +9,6 @@ import { BlogListPage } from './pages/BlogListPage.tsx';
 import { ArticleDetailPage } from './pages/ArticleDetailPage.tsx';
 import { CoursesPage } from './pages/CoursesPage.tsx';
 import { SpecializationsPage } from './pages/SpecializationsPage.tsx';
-import { AdminDashboard } from './components/AdminDashboard.tsx';
 import { INITIAL_INSTITUTES } from './data/institutesData.ts';
 import { INITIAL_ARTICLES } from './data/articlesData.ts';
 import { Institute, Article } from './types/index.ts';
@@ -97,19 +96,7 @@ export default function App() {
       );
     }
 
-    // 2. Admin Portal (/admin/)
-    if (path.startsWith('/admin')) {
-      return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <AdminDashboard
-            onNavigate={navigate}
-            onRefreshData={refreshInstitutes}
-          />
-        </div>
-      );
-    }
-
-    // 3. College Detail Page (/college/:slug/)
+    // 2. College Detail Page (/college/:slug/)
     if (path.startsWith('/college/')) {
       const slug = path.replace('/college/', '').replace(/\/$/, '');
       const institute = institutes.find(i => i.slug.toLowerCase() === slug.toLowerCase());

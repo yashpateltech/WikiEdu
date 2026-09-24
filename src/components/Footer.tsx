@@ -1,5 +1,5 @@
 import React from 'react';
-import { GraduationCap, ShieldCheck, Mail, MapPin, ExternalLink, Globe2 } from 'lucide-react';
+import { GraduationCap, Mail, MapPin, ExternalLink, Globe2, CheckCircle } from 'lucide-react';
 
 interface FooterProps {
   onNavigate: (path: string) => void;
@@ -27,7 +27,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
             <div className="pt-2 text-xs text-slate-400 space-y-2">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <span>Verified program information curated from official institutions</span>
               </div>
               <div className="flex items-center gap-2">
@@ -191,15 +191,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate('/admin/')}
-                  className="hover:text-blue-400 transition-colors text-indigo-400 hover:underline flex items-center gap-1"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Admin Management</span>
-                </button>
-              </li>
-              <li>
                 <a
                   href="/sitemap.xml"
                   target="_blank"
@@ -249,8 +240,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <button onClick={() => onNavigate('/')} className="hover:text-slate-300">Privacy Policy</button>
             <span>•</span>
             <button onClick={() => onNavigate('/')} className="hover:text-slate-300">Terms of Service</button>
-            <span>•</span>
-            <button onClick={() => onNavigate('/admin/')} className="hover:text-indigo-400">Admin Login</button>
           </div>
         </div>
       </div>
