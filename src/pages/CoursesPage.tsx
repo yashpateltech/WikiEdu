@@ -6,6 +6,8 @@ import { SeoHead } from '../components/SeoHead.tsx';
 import { AdvertisementCard } from '../components/AdvertisementCard.tsx';
 import { GraduationCap, Clock, Award, CheckCircle } from 'lucide-react';
 
+import { Pagination } from '../components/Pagination.tsx';
+
 interface CoursesPageProps {
   programSlug: string;
   institutes: Institute[];
@@ -19,6 +21,12 @@ export const CoursesPage: React.FC<CoursesPageProps> = ({
   onNavigate,
   onOpenEnquiry
 }) => {
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 12;
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [programSlug]);
   // Format slug to human readable
   const programMap: Record<string, { title: string; description: string; typeFilter: string }> = {
     mba: {
@@ -125,15 +133,25 @@ export const CoursesPage: React.FC<CoursesPageProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div className="lg:col-span-3 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {matchingInstitutes.map(inst => (
-              <InstituteCard
-                key={inst.id}
-                institute={inst}
-                onViewDetails={slug => onNavigate(`/college/${slug}/`)}
-                onEnquireNow={(col, crs) => onOpenEnquiry(col, crs)}
-              />
-            ))}
+            {matchingInstitutes
+              .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+              .map(inst => (
+                <InstituteCard
+                  key={inst.id}
+                  institute={inst}
+                  onViewDetails={slug => onNavigate(`/college/${slug}/`)}
+                  onEnquireNow={(col, crs) => onOpenEnquiry(col, crs)}
+                />
+              ))}
           </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(matchingInstitutes.length / itemsPerPage)}
+            onPageChange={setCurrentPage}
+            totalItems={matchingInstitutes.length}
+            itemsPerPage={itemsPerPage}
+          />
         </div>
 
         {/* Sidebar */}

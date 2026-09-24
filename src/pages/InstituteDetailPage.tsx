@@ -22,6 +22,7 @@ import { CourseCard } from '../components/CourseCard.tsx';
 import { Breadcrumbs } from '../components/Breadcrumbs.tsx';
 import { SeoHead } from '../components/SeoHead.tsx';
 import { AdvertisementCard } from '../components/AdvertisementCard.tsx';
+import { CollegeLogo } from '../components/CollegeLogo.tsx';
 
 interface InstituteDetailPageProps {
   institute: Institute;
@@ -115,7 +116,11 @@ export const InstituteDetailPage: React.FC<InstituteDetailPageProps> = ({
         <div className="relative h-64 sm:h-80 w-full overflow-hidden bg-slate-900">
           <img
             src={institute.coverImage}
-            alt={institute.name}
+            alt={`${institute.name} campus architecture`}
+            onError={e => {
+              (e.target as HTMLImageElement).src =
+                'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&auto=format&fit=crop&q=80';
+            }}
             className="w-full h-full object-cover opacity-85"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent"></div>
@@ -151,11 +156,13 @@ export const InstituteDetailPage: React.FC<InstituteDetailPageProps> = ({
         <div className="p-6 sm:p-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-start gap-4">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-4 border-white bg-white shadow-lg overflow-hidden flex-shrink-0 -mt-14 sm:-mt-16 z-10 p-1">
-                <img
-                  src={institute.logo}
-                  alt={`${institute.name} logo`}
-                  className="w-full h-full object-cover rounded-xl"
+              <div className="-mt-14 sm:-mt-16 z-10 shadow-xl rounded-2xl">
+                <CollegeLogo
+                  name={institute.name}
+                  websiteUrl={institute.officialWebsite}
+                  logoUrl={institute.logo}
+                  size="xl"
+                  rounded="rounded-2xl"
                 />
               </div>
 

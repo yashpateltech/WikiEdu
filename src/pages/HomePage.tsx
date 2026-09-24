@@ -18,6 +18,7 @@ import {
 import { Institute, Article } from '../types/index.ts';
 import { SearchBar } from '../components/SearchBar.tsx';
 import { InstituteCard } from '../components/InstituteCard.tsx';
+import { SponsoredPartnerCard } from '../components/SponsoredPartnerCard.tsx';
 import { ArticleCard } from '../components/ArticleCard.tsx';
 import { SeoHead } from '../components/SeoHead.tsx';
 import { COUNTRIES, SPECIALIZATIONS } from '../data/institutesData.ts';
@@ -147,6 +148,12 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Sponsored Partner Box placed first where all college boxes start */}
+          <SponsoredPartnerCard
+            onEnquireNow={(col, crs) => onOpenEnquiry(col, crs)}
+            onViewDetails={slug => onNavigate(`/college/${slug}/`)}
+          />
+
           {featuredInstitutes.map(inst => (
             <InstituteCard
               key={inst.id}

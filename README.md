@@ -54,6 +54,13 @@ A complete, modern, responsive educational website and independent information p
    - Displayed on desktop institute profile and article pages.
 
 6. **Admin & Management Portal (`/admin/`)**
+   - **Administrator Login Authentication**:
+     - **Admin ID / Email**: `yashpatelseo19@gmail.com`
+     - **Password**: `Yp1311999@`
+     - Secure session tokens stored and validated with `/api/admin/login` and `/api/admin/session`.
+   - **Global Dataset of 1,000 Verified Institutes**:
+     - Complete repository of 1,000 business schools worldwide across 17 countries/regions (India, USA, UK, France, Germany, Spain, Canada, Australia, Singapore, UAE, Switzerland, Netherlands, Italy, Ireland, Japan, South Korea, etc.).
+     - Paginated registry table with keyword search, country filter, program type filter, and featured status toggles.
    - Manage business schools (Create, Update, Delete, Toggle Featured).
    - Fields: Name, Country, City, Description, Official Website, Logo, Cover Image, Programs, Fees, Duration, Eligibility, Specializations, Application URL, Featured status.
    - Manage student lead enquiries (view contact info, course interested, background, and update statuses: *New*, *In Review*, *Contacted*, *Closed*).

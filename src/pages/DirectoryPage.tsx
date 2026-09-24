@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Institute } from '../types/index.ts';
 import { InstituteCard } from '../components/InstituteCard.tsx';
+import { SponsoredPartnerCard } from '../components/SponsoredPartnerCard.tsx';
 import { FilterSidebar } from '../components/FilterSidebar.tsx';
 import { Breadcrumbs } from '../components/Breadcrumbs.tsx';
 import { Pagination } from '../components/Pagination.tsx';
@@ -28,7 +29,12 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
   const [selectedSpecialization, setSelectedSpecialization] = useState('All Specializations');
   const [selectedProgramType, setSelectedProgramType] = useState('All Program Types');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 12;
+
+  // Reset pagination on filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCountry, selectedSpecialization, selectedProgramType]);
 
   // Filtered institutes
   const filteredInstitutes = useMemo(() => {
@@ -197,6 +203,12 @@ export const DirectoryPage: React.FC<DirectoryPageProps> = ({
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Sponsored Partner Box at the first position where all college boxes start */}
+                <SponsoredPartnerCard
+                  onEnquireNow={(col, crs) => onOpenEnquiry(col, crs)}
+                  onViewDetails={slug => onNavigate(`/college/${slug}/`)}
+                />
+
                 {paginatedInstitutes.map(inst => (
                   <InstituteCard
                     key={inst.id}

@@ -4,6 +4,7 @@ import { InstituteCard } from '../components/InstituteCard.tsx';
 import { Breadcrumbs } from '../components/Breadcrumbs.tsx';
 import { SeoHead } from '../components/SeoHead.tsx';
 import { AdvertisementCard } from '../components/AdvertisementCard.tsx';
+import { Pagination } from '../components/Pagination.tsx';
 import { Award, CheckCircle } from 'lucide-react';
 import { SPECIALIZATIONS } from '../data/institutesData.ts';
 
@@ -20,6 +21,12 @@ export const SpecializationsPage: React.FC<SpecializationsPageProps> = ({
   onNavigate,
   onOpenEnquiry
 }) => {
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 12;
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [specializationSlug]);
   // Convert slug to clean title
   const cleanTitle = specializationSlug
     .split('-')
@@ -92,16 +99,28 @@ export const SpecializationsPage: React.FC<SpecializationsPageProps> = ({
               No programs found matching this specialization currently.
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {matchingInstitutes.map(inst => (
-                <InstituteCard
-                  key={inst.id}
-                  institute={inst}
-                  onViewDetails={slug => onNavigate(`/college/${slug}/`)}
-                  onEnquireNow={(col, crs) => onOpenEnquiry(col, crs)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {matchingInstitutes
+                  .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                  .map(inst => (
+                    <InstituteCard
+                      key={inst.id}
+                      institute={inst}
+                      onViewDetails={slug => onNavigate(`/college/${slug}/`)}
+                      onEnquireNow={(col, crs) => onOpenEnquiry(col, crs)}
+                    />
+                  ))}
+              </div>
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(matchingInstitutes.length / itemsPerPage)}
+                onPageChange={setCurrentPage}
+                totalItems={matchingInstitutes.length}
+                itemsPerPage={itemsPerPage}
+              />
+            </>
           )}
         </div>
 

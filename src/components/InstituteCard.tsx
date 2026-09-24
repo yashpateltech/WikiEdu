@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin, Clock, DollarSign, Award, ExternalLink, Send, ArrowRight, CheckCircle } from 'lucide-react';
 import { Institute } from '../types/index.ts';
+import { CollegeLogo } from './CollegeLogo.tsx';
 
 interface InstituteCardProps {
   institute: Institute;
@@ -19,7 +20,11 @@ export const InstituteCard: React.FC<InstituteCardProps> = ({
       <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-100">
         <img
           src={institute.coverImage}
-          alt={institute.name}
+          alt={`${institute.name} campus architecture`}
+          onError={e => {
+            (e.target as HTMLImageElement).src =
+              'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&auto=format&fit=crop&q=80';
+          }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
@@ -39,12 +44,14 @@ export const InstituteCard: React.FC<InstituteCardProps> = ({
           <span>{institute.city}, {institute.country}</span>
         </div>
 
-        {/* Logo Avatar floating */}
-        <div className="absolute -bottom-4 left-4 w-14 h-14 rounded-xl border-2 border-white shadow-md bg-white overflow-hidden flex items-center justify-center p-1">
-          <img
-            src={institute.logo}
-            alt={`${institute.name} logo`}
-            className="w-full h-full object-cover rounded-lg"
+        {/* Official Website Logo Avatar floating */}
+        <div className="absolute -bottom-4 left-4 z-10 shadow-md rounded-xl">
+          <CollegeLogo
+            name={institute.name}
+            websiteUrl={institute.officialWebsite}
+            logoUrl={institute.logo}
+            size="lg"
+            rounded="rounded-xl"
           />
         </div>
       </div>
